@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Panel Admin | ONDERDEEL24</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="ONDERDEEL24, ke beranda">
+      <img class="brand-logo" src="logo-header.png" alt="ONDERDEEL24">
+    </a>
+    <nav class="nav" aria-label="Menu utama">
+      <a href="index.html">← Kembali ke situs</a>
+    </nav>
+  </div>
+</header>
+
+<main id="atas">
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <h2>Halaman Khusus Administrator</h2>
+          <p>Halaman ini khusus digunakan untuk pengelolaan produk dan stok ONDERDEEL24. Customer dapat mengakses katalog melalui halaman utama.</p>
+        </div>
+      </div>
+
+      <div class="admin-note">
+        <strong>⚠️ Peringatan:</strong> Anda sedang berada di halaman login administrator Onderdeel24. <strong>Halaman ini digunakan khusus untuk pengelolaan sistem dan katalog produk dan bukan untuk penggunaan customer atau pengunjung umum.</strong> Apabila Anda hanya ingin melihat atau mencari produk, silakan kembali ke halaman utama. Pastikan Anda memiliki izin administrator sebelum melanjutkan.
+      </div>
+
+      <div id="admin-checking" style="text-align:center; padding:48px 0; color:var(--muted);">Memeriksa sesi masuk…</div>
+
+      <div class="admin-gate" id="admin-gate" hidden>
+        <h3 style="font-family:var(--font-display);font-weight:800;font-size:1.2rem;margin:0 0 6px;">Masuk sebagai admin</h3>
+        <p style="color:var(--muted);margin:0 0 18px;">Gunakan akun yang memiliki akses untuk melanjutkan.</p>
+        <form id="gate-form">
+          <div class="field" style="text-align:left;">
+            <label for="gate-email">Email</label>
+            <input class="input" type="email" id="gate-email" autocomplete="username" required>
+          </div>
+          <div class="field" style="text-align:left;">
+            <label for="gate-pass">Kata sandi</label>
+            <input class="input" type="password" id="gate-pass" autocomplete="current-password" required>
+          </div>
+          <p id="gate-error" hidden style="color:var(--orange-btn);font-weight:700;margin:0 0 12px;">Email atau kata sandi salah, coba lagi.</p>
+          <button class="btn" type="submit" id="gate-submit">Masuk</button>
+        </form>
+      </div>
+
+      <div class="admin-panel" id="admin-panel" hidden>
+        <div class="admin-toolbar">
+          <span id="admin-count" style="color:var(--muted);font-weight:600;"></span>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn ghost sm" type="button" id="admin-reset">Muat ulang dari database</button>
+            <button class="btn ghost sm" type="button" id="admin-logout">Keluar</button>
+          </div>
+        </div>
+
+        <div class="admin-grid">
+          <form class="admin-form" id="product-form">
+            <h3 id="form-title">Tambah produk baru</h3>
+            <input type="hidden" id="f-index" value="-1">
+            <div class="field">
+              <label for="f-name">Nama produk</label>
+              <input class="input" id="f-name" required>
+            </div>
+            <div class="row2">
+              <div class="field">
+                <label for="f-cat">Kategori</label>
+                <select class="select" id="f-cat"></select>
+              </div>
+              <div class="field">
+                <label for="f-tag">Jenis</label>
+                <select class="select" id="f-tag">
+                  <option value="OEM">OEM</option>
+                  <option value="Aftermarket">Aftermarket</option>
+                </select>
+              </div>
+            </div>
+            <div class="row2">
+              <div class="field">
+                <label for="f-price">Harga (Rp)</label>
+                <input class="input" id="f-price" type="number" min="0" step="1000" required>
+              </div>
+              <div class="field">
+                <label for="f-stock">Stok</label>
+                <input class="input" id="f-stock" type="number" min="0" step="1" required>
+              </div>
+            </div>
+            <div class="field">
+              <label for="f-fits">Cocok untuk mobil <span class="hint">(satu baris satu tipe: Merek - Model. Kosongkan jika cocok untuk banyak mobil)</span></label>
+              <textarea class="textarea" id="f-fits" placeholder="Toyota - Avanza&#10;Daihatsu - Xenia"></textarea>
+              <label for="f-image">Path foto produk (folder assets)</label>
+              <input type="text" id="f-image" placeholder="assets/produk/kampasremdepan.png">
+              <img id="f-image-preview" alt="" style="display:none; max-width:120px; margin-top:8px; border-radius:8px;">
+            </div>
+            <div class="actions">
+              <button class="btn" type="submit" id="form-submit">Tambah produk</button>
+              <button class="btn ghost" type="button" id="form-cancel" hidden>Batal edit</button>
+            </div>
+            
+          </form>
+
+          <div>
+            <div class="admin-list" id="admin-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a class="brand" href="index.html" aria-label="ONDERDEEL24, ke beranda">
+          <img class="brand-logo footer-logo" src="logo-footer.png" alt="ONDERDEEL24">
+        </a>
+        <p>Toko sparepart mobil. Kunjungi langsung di jam buka, atau chat WhatsApp saat malam hari.</p>
+      </div>
+      <div>
+        <h3>Jam buka</h3>
+        <ul id="foot-hours"></ul>
+      </div>
+      <div>
+        <h3>Hubungi kami</h3>
+        <ul>
+          <li><a id="foot-wa" href="#" target="_blank" rel="noopener">WhatsApp: +62878-6929-0359</a></li>
+          <li><a href="mailto:onderdeel24@gmail.com">onderdeel24@gmail.com</a></li>
+          <li> Jl. Sultan Agung, Karanggayam, Teluk, Kec. Purwokerto Sel., Kabupaten Banyumas, Jawa Tengah 53145</li>
+        </ul>
+      </div>
+    </div>
+    <div class="copy">&copy; 2026 ONDERDEEL24. Semua hak dilindungi.</div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="products-data.js"></script>
+<script src="script.js" defer></script>
+<script src="admin.js" defer></script>
+</body>
+</html>

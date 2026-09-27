@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bantuan dan FAQ | ONDERDEEL24</title>
+<meta name="description" content="Cara belanja dan pertanyaan yang sering diajukan seputar ONDERDEEL24.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Simbol gerigi -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="gear" viewBox="0 0 104 104">
+      <g transform="translate(52 52)" fill="currentColor">
+        <rect x="-8" y="-50" width="16" height="16" rx="3"/>
+        <rect x="-8" y="-50" width="16" height="16" rx="3" transform="rotate(30)"/>
+        <rect x="-8" y="-50" width="16" height="16" rx="3" transform="rotate(60)"/>
+        <rect x="-8" y="-50" width="16" height="16" rx="3" transform="rotate(90)"/>
+        <rect x="-8" y="-50" width="16" height="16" rx="3" transform="rotate(120)"/>
+        <rect x="-8" y="-50" width="16" height="16" rx="3" transform="rotate(150)"/>
+        <rect x="-8" y="-50" width="16" height="16" rx="3" transform="rotate(180)"/>
+        <rect x="-8" y="-50" width="16" height="16" rx="3" transform="rotate(210)"/>
+        <rect x="-8" y="-50" width="16" height="16" rx="3" transform="rotate(240)"/>
+        <rect x="-8" y="-50" width="16" height="16" rx="3" transform="rotate(270)"/>
+        <rect x="-8" y="-50" width="16" height="16" rx="3" transform="rotate(300)"/>
+        <rect x="-8" y="-50" width="16" height="16" rx="3" transform="rotate(330)"/>
+        <path fill-rule="evenodd" d="M-40 0a40 40 0 1 0 80 0a40 40 0 1 0 -80 0ZM-24 0a24 24 0 1 0 48 0a24 24 0 1 0 -48 0Z"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="ONDERDEEL24, ke beranda">
+      <img class="brand-logo" src="logo-header.png" alt="ONDERDEEL24">
+    </a>
+    <nav class="nav" aria-label="Menu utama">
+      <a href="kunjungi-toko.html">Kunjungi Toko</a>
+      <a href="katalog.html">Katalog</a>
+      <a href="layanan-malam.html">Layanan Kami</a>
+      <a href="bantuan.html" aria-current="page">Bantuan</a>
+    </nav>
+    <div class="header-right">
+      <button class="cart-btn" id="open-cart" type="button" aria-haspopup="dialog">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.4 12.2a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L20 8H6"/></svg>
+        <span class="label">Daftar belanja</span>
+        <span class="cart-count" id="cart-count" aria-label="0 barang">0</span>
+      </button>
+      <button class="nav-toggle" id="nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Buka menu">
+        <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19"/></svg>
+      </button>
+    </div>
+    <nav class="mobile-nav" id="mobile-nav" aria-label="Menu utama (mobile)">
+      <a href="kunjungi-toko.html">Kunjungi Toko</a>
+      <a href="katalog.html">Katalog</a>
+      <a href="layanan-malam.html">Layanan Kami</a>
+      <a href="bantuan.html" aria-current="page">Bantuan</a>
+    </nav>
+  </div>
+</header>
+
+<main id="atas">
+  <section class="section">
+    <div class="wrap split">
+      <div>
+        <h2>Cara belanja di sini</h2>
+        <ol class="steps">
+          <li>
+            <div>
+              <h3>Susun daftar part</h3>
+              <p>Cari dan tambahkan sparepart yang kamu butuhkan ke daftar belanja lewat <a href="katalog.html">katalog</a>.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Toko buka: langsung datang</h3>
+              <p>Bawa daftar belanjamu ke toko. Mekanik kami cek kecocokan part dengan mobilmu sebelum kamu bayar.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Toko tutup: kirim via WhatsApp</h3>
+              <p>Malam hari, kirim daftar yang sama lewat WhatsApp. Kami balas dan siapkan part begitu toko buka.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+      <div id="bantuan">
+        <h2>Pertanyaan yang sering muncul</h2>
+        <details>
+          <summary>Kenapa harus datang ke toko?</summary>
+          <p>Sebagian part perlu dicek nomor rangka atau dicoba langsung ke mobil supaya benar-benar pas. Kunjungan langsung membuat mekanik kami bisa memastikan itu sebelum kamu membayar.</p>
+        </details>
+        <details>
+          <summary>Bagaimana kalau saya butuh part malam hari?</summary>
+          <p>Kirim daftar part lewat <a href="layanan-malam.html">WhatsApp</a>. Kami balas begitu toko buka esok paginya, dan part bisa langsung diambil atau dikirim.</p>
+        </details>
+        <details>
+          <summary>Apakah harga di katalog sudah pasti?</summary>
+          <p>Harga di katalog adalah harga acuan. Saat kamu datang atau chat WhatsApp, kami konfirmasi ulang sesuai stok dan kecocokan dengan mobilmu.</p>
+        </details>
+        <details>
+          <summary>Apakah bisa retur jika salah tipe?</summary>
+          <p>Bisa, dalam 7 hari setelah pembelian. Part harus belum dipasang, masih utuh, dan dalam kemasan aslinya. Datang langsung ke toko untuk proses retur.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a class="brand" href="index.html" aria-label="ONDERDEEL24, ke beranda">
+          <img class="brand-logo footer-logo" src="logo-footer.png" alt="ONDERDEEL24">
+        </a>
+        <p>Toko sparepart mobil. Kunjungi langsung di jam buka, atau chat WhatsApp saat malam hari.</p>
+      </div>
+      <div>
+        <h3>Jam buka</h3>
+        <ul id="foot-hours"></ul>
+      </div>
+      <div>
+        <h3>Hubungi kami</h3>
+        <ul>
+         <li><a id="foot-wa" href="#" target="_blank" rel="noopener">WhatsApp: +62878-6929-0359</a></li>
+          <li><a href="mailto:onderdeel24@gmail.com">onderdeel24@gmail.com</a></li>
+          <li> Jl. Sultan Agung, Karanggayam, Teluk, Kec. Purwokerto Sel., Kabupaten Banyumas, Jawa Tengah 53145</li>
+          <li><a href="admin.html">Admin toko</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="copy">&copy; 2026 ONDERDEEL24. Semua hak dilindungi.</div>
+  </div>
+</footer>
+
+<!-- Keranjang -->
+<div class="overlay" id="overlay"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" inert>
+  <div class="drawer-head">
+    <h2 id="drawer-title">Daftar belanja</h2>
+    <button class="icon-btn" id="close-cart" type="button" aria-label="Tutup daftar belanja">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19"/></svg>
+    </button>
+  </div>
+  <p class="drawer-note" id="drawer-mode-note"></p>
+  <div class="drawer-body" id="drawer-body"></div>
+  <div class="drawer-foot" id="drawer-foot">
+    <div class="total"><span>Perkiraan subtotal</span><strong id="subtotal">Rp 0</strong></div>
+    <p class="note" id="drawer-note-2">Harga dikonfirmasi ulang saat kamu datang ke toko atau chat WhatsApp.</p>
+    <a class="btn" id="checkout" href="#" target="_blank" rel="noopener" aria-disabled="true">Kirim daftar ke WhatsApp</a>
+  </div>
+</aside>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="products-data.js"></script>
+<script src="script.js" defer></script>
+</body>
+</html>

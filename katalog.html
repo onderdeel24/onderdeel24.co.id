@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Katalog Sparepart | ONDERDEEL24</title>
+<meta name="description" content="Katalog sparepart mobil ONDERDEEL24, cari berdasarkan kategori, merek, atau tipe kendaraan.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Simbol gerigi -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="gear" viewBox="0 0 104 104">
+      <g transform="translate(52 52)" fill="currentColor">
+        <rect x="-8" y="-50" width="16" height="16" rx="3"/>
+        <rect x="-8" y="-50" width="16" height="16" rx="3" transform="rotate(30)"/>
+        <rect x="-8" y="-50" width="16" height="16" rx="3" transform="rotate(60)"/>
+        <rect x="-8" y="-50" width="16" height="16" rx="3" transform="rotate(90)"/>
+        <rect x="-8" y="-50" width="16" height="16" rx="3" transform="rotate(120)"/>
+        <rect x="-8" y="-50" width="16" height="16" rx="3" transform="rotate(150)"/>
+        <rect x="-8" y="-50" width="16" height="16" rx="3" transform="rotate(180)"/>
+        <rect x="-8" y="-50" width="16" height="16" rx="3" transform="rotate(210)"/>
+        <rect x="-8" y="-50" width="16" height="16" rx="3" transform="rotate(240)"/>
+        <rect x="-8" y="-50" width="16" height="16" rx="3" transform="rotate(270)"/>
+        <rect x="-8" y="-50" width="16" height="16" rx="3" transform="rotate(300)"/>
+        <rect x="-8" y="-50" width="16" height="16" rx="3" transform="rotate(330)"/>
+        <path fill-rule="evenodd" d="M-40 0a40 40 0 1 0 80 0a40 40 0 1 0 -80 0ZM-24 0a24 24 0 1 0 48 0a24 24 0 1 0 -48 0Z"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="ONDERDEEL24, ke beranda">
+      <img class="brand-logo" src="logo-header.png" alt="ONDERDEEL24">
+    </a>
+    <nav class="nav" aria-label="Menu utama">
+      <a href="kunjungi-toko.html">Kunjungi Toko</a>
+      <a href="katalog.html" aria-current="page">Katalog</a>
+      <a href="layanan-malam.html">Layanan Kami</a>
+      <a href="bantuan.html">Bantuan</a>
+    </nav>
+    <div class="header-right">
+      <button class="cart-btn" id="open-cart" type="button" aria-haspopup="dialog">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.4 12.2a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L20 8H6"/></svg>
+        <span class="label">Daftar belanja</span>
+        <span class="cart-count" id="cart-count" aria-label="0 barang">0</span>
+      </button>
+      <button class="nav-toggle" id="nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Buka menu">
+        <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19"/></svg>
+      </button>
+    </div>
+    <nav class="mobile-nav" id="mobile-nav" aria-label="Menu utama (mobile)">
+      <a href="kunjungi-toko.html">Kunjungi Toko</a>
+      <a href="katalog.html" aria-current="page">Katalog</a>
+      <a href="layanan-malam.html">Layanan Kami</a>
+      <a href="bantuan.html">Bantuan</a>
+    </nav>
+  </div>
+</header>
+
+<main id="atas">
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <h2>Belanja per kategori</h2>
+          <p>Pilih kategori untuk menyaring katalog di bawah.</p>
+        </div>
+      </div>
+      <div class="cats" id="cats"></div>
+    </div>
+  </section>
+
+  <section class="section tint" id="produk">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <h2>Katalog sparepart mobil</h2>
+          <p>Harga sudah termasuk PPN. Susun daftar di sini, lalu kunjungi toko atau kirim lewat WhatsApp saat malam hari.</p>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="input-wrap">
+          <label class="sr-only" for="q">Cari produk</label>
+          <input class="input" id="q" type="search" placeholder="Cari nama part, merek, atau model mobil" autocomplete="off" style="width:100%; min-height:46px; padding:0 14px; border:2px solid var(--line); border-radius:10px; background:var(--surface);">
+        </div>
+        <div>
+          <label class="sr-only" for="sort">Urutkan</label>
+          <select class="select" id="sort" style="width:100%; min-height:46px; padding:0 14px; border:2px solid var(--line); border-radius:10px; background:var(--surface);">
+            <option value="rek">Urutkan: Rekomendasi</option>
+            <option value="murah">Harga terendah</option>
+            <option value="mahal">Harga tertinggi</option>
+            <option value="nama">Nama A-Z</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="status" aria-live="polite">
+        <span id="status-text"></span>
+        <button class="link-btn" id="reset" type="button" hidden>Hapus semua filter</button>
+      </div>
+
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a class="brand" href="index.html" aria-label="ONDERDEEL24, ke beranda">
+          <img class="brand-logo footer-logo" src="logo-footer.png" alt="ONDERDEEL24">
+        </a>
+        <p>Toko sparepart mobil. Kunjungi langsung di jam buka, atau chat WhatsApp saat malam hari.</p>
+      </div>
+      <div>
+        <h3>Jam buka</h3>
+        <ul id="foot-hours"></ul>
+      </div>
+      <div>
+        <h3>Hubungi kami</h3>
+        <ul>
+          <li><a id="foot-wa" href="#" target="_blank" rel="noopener">WhatsApp: +62878-6929-0359</a></li>
+          <li><a href="mailto:onderdeel24@gmail.com">onderdeel24@gmail.com</a></li>
+          <li> Jl. Sultan Agung, Karanggayam, Teluk, Kec. Purwokerto Sel., Kabupaten Banyumas, Jawa Tengah 53145</li>
+          <li><a href="admin.html">Admin toko</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="copy">&copy; 2026 ONDERDEEL24. Semua hak dilindungi.</div>
+  </div>
+</footer>
+
+<!-- Keranjang -->
+<div class="overlay" id="overlay"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" inert>
+  <div class="drawer-head">
+    <h2 id="drawer-title">Daftar belanja</h2>
+    <button class="icon-btn" id="close-cart" type="button" aria-label="Tutup daftar belanja">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19"/></svg>
+    </button>
+  </div>
+  <p class="drawer-note" id="drawer-mode-note"></p>
+  <div class="drawer-body" id="drawer-body"></div>
+  <div class="drawer-foot" id="drawer-foot">
+    <div class="total"><span>Perkiraan subtotal</span><strong id="subtotal">Rp 0</strong></div>
+    <p class="note" id="drawer-note-2">Harga dikonfirmasi ulang saat kamu datang ke toko atau chat WhatsApp.</p>
+    <a class="btn" id="checkout" href="#" target="_blank" rel="noopener" aria-disabled="true">Kirim daftar ke WhatsApp</a>
+  </div>
+</aside>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="products-data.js"></script>
+<script src="script.js" defer></script>
+</body>
+</html>
