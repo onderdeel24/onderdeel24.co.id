@@ -101,9 +101,17 @@
             <div class="field">
               <label for="f-fits">Cocok untuk mobil <span class="hint">(satu baris satu tipe: Merek - Model. Kosongkan jika cocok untuk banyak mobil)</span></label>
               <textarea class="textarea" id="f-fits" placeholder="Toyota - Avanza&#10;Daihatsu - Xenia"></textarea>
-              <label for="f-image">Path foto produk (folder assets)</label>
-              <input type="text" id="f-image" placeholder="assets/produk/kampasremdepan.png">
-              <img id="f-image-preview" alt="" style="display:none; max-width:120px; margin-top:8px; border-radius:8px;">
+            </div>
+            <div class="field">
+              <label for="f-file">Foto produk <span class="hint">(JPG, PNG, atau WebP. Diunggah ke penyimpanan online, bukan ke folder situs)</span></label>
+              <div class="img-tools">
+                <input class="input" type="file" id="f-file" accept="image/jpeg,image/png,image/webp,image/gif">
+                <p class="img-status" id="f-image-status" role="status" aria-live="polite"></p>
+                <img class="img-preview" id="f-image-preview" alt="Pratinjau foto produk">
+                <button class="btn ghost sm img-remove" type="button" id="f-image-remove" hidden>Hapus foto</button>
+                <label for="f-image" class="hint" style="font-weight:400;">Atau tempel URL foto (https://…)</label>
+                <input class="input" type="text" inputmode="url" id="f-image" placeholder="https://contoh.com/foto-produk.jpg" autocomplete="off">
+              </div>
             </div>
             <div class="actions">
               <button class="btn" type="submit" id="form-submit">Tambah produk</button>

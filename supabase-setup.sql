@@ -12,6 +12,7 @@ create table if not exists public.products (
   price       integer not null default 0,
   stock       integer not null default 0,
   fits        jsonb,                                -- null, atau array [["Toyota","Avanza"], ...]
+  image       text,                                 -- URL foto produk (Supabase Storage / sumber online lain)
   created_at  timestamptz not null default now()
 );
 

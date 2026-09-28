@@ -19,6 +19,7 @@
   var SUPABASE_ANON_KEY = "sb_publishable_L5BC0VjiI_NgxMeFBLAvYQ_zuJzRh8V";
 
   var TABLE = "products";
+  var IMAGE_BUCKET = "product-images"; // bucket Supabase Storage (dibuat lewat supabase-foto-eksternal.sql)
   var supabase = null;
 
   function isConfigured() {
@@ -104,6 +105,24 @@
       });
   }
 
+  /* ====== UNGGAH FOTO PRODUK (penyimpanan eksternal: Supabase Storage) ======
+     Foto TIDAK disimpan di folder situs. File diunggah ke bucket publik
+     "product-images", lalu yang disimpan di kolom "image" produk hanyalah
+     URL publiknya (https://...supabase.co/storage/v1/object/public/...).
+     Mengembalikan Promise<string> berisi URL foto. */
+  function uploadProductImage(file) {
+    if (!supabase) return Promise.reject(notReady());
+    var ext = ({ "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif" })[file.type] || "jpg";
+    var name = "produk/" + Date.now() + "-" + Math.random().toString(36).slice(2, 8) + "." + ext;
+    return supabase.storage.from(IMAGE_BUCKET)
+      .upload(name, file, { contentType: file.type, cacheControl: "31536000", upsert: false })
+      .then(function (res) {
+        if (res.error) throw res.error;
+        var pub = supabase.storage.from(IMAGE_BUCKET).getPublicUrl(name);
+        return pub.data.publicUrl;
+      });
+  }
+
   /* ====== AUTENTIKASI ADMIN (Supabase Auth) ======
      Login sungguhan: hanya akun yang login lewat sini yang diizinkan
      database (lewat RLS policy di supabase-setup.sql) untuk menambah,
@@ -145,6 +164,7 @@
     addProduct: addProduct,
     updateProduct: updateProduct,
     deleteProduct: deleteProduct,
+    uploadProductImage: uploadProductImage,
     signIn: signIn,
     signOut: signOut,
     getSession: getSession,

@@ -26,6 +26,24 @@ langkah berikut sebelum situs di-upload.
    (bisa dicek di menu **Table Editor**), lengkap dengan aturan
    "siapa saja boleh baca, cuma yang login boleh tulis".
 
+## 2b. Aktifkan penyimpanan foto produk (Supabase Storage)
+
+Foto produk **tidak lagi disimpan di folder situs**. Foto diunggah ke
+penyimpanan online Supabase, dan yang tersimpan di data produk hanyalah
+URL-nya.
+
+1. Buka **SQL Editor** -> **New query**.
+2. Salin seluruh isi `supabase-foto-eksternal.sql`, tempel, lalu **Run**.
+   (Ini menambah kolom `image` di tabel `products`, membuat bucket publik
+   `product-images`, dan mengizinkan hanya admin yang login untuk unggah foto.
+   Aman dijalankan ulang; data produk lama tidak berubah.)
+3. Di `admin.html`, pada form Tambah/Ubah produk pilih file foto (maks. 8 MB;
+   otomatis diperkecil), atau tempel URL foto dari sumber online lain.
+
+Produk lama yang masih memakai path `assets/produk/...` tetap tampil seperti
+biasa. Untuk memindahkannya ke penyimpanan online, edit produknya lalu
+unggah ulang fotonya.
+
 ## 3. Buat akun admin (Supabase Auth)
 
 Panel admin login pakai akun sungguhan (email + password), bukan

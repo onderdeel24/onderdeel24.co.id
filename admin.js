@@ -107,29 +107,109 @@
   var form = $("product-form"), formTitle = $("form-title"), submitBtn = $("form-submit"), cancelBtn = $("form-cancel");
   var submitBtnDefaultText = submitBtn.textContent;
 
-  /* Pratinjau foto: cari elemen #f-image-preview di HTML (opsional).
-     Kalau elemen ini tidak ada di HTML, kode ini tidak melakukan apa-apa
-     dan tidak akan error. */
+  /* ====== FOTO PRODUK (penyimpanan eksternal) ======
+     Admin memilih file -> diperkecil di browser (rasio asli dijaga) ->
+     diunggah ke Supabase Storage -> URL publiknya masuk ke kolom "image".
+     Admin juga boleh langsung menempel URL foto dari sumber online lain. */
   var imageInput = $("f-image");
   var imagePreview = $("f-image-preview");
+  var fileInput = $("f-file");
+  var imageStatus = $("f-image-status");
+  var imageRemoveBtn = $("f-image-remove");
+  var originalImage = "";   // nilai foto saat mulai edit (untuk produk lama)
+  var uploading = false;
+  var MAX_UPLOAD_BYTES = 8 * 1024 * 1024; // batas file mentah yang dipilih
+  var MAX_SIDE = 1200;                    // sisi terpanjang setelah diperkecil
+
+  function setImageStatus(msg, isErr) {
+    if (!imageStatus) return;
+    imageStatus.textContent = msg || "";
+    imageStatus.classList.toggle("err", !!isErr);
+  }
 
   function updateImagePreview() {
-    if (!imagePreview) return;
     var src = imageInput ? imageInput.value.trim() : "";
+    if (imageRemoveBtn) imageRemoveBtn.hidden = !src;
+    if (!imagePreview) return;
     if (src) {
+      imagePreview.onerror = function () { imagePreview.style.display = "none"; };
+      imagePreview.onload = function () { imagePreview.style.display = "block"; };
       imagePreview.src = src;
-      imagePreview.style.display = "block";
-      imagePreview.onerror = function () {
-        imagePreview.style.display = "none";
-      };
     } else {
       imagePreview.style.display = "none";
       imagePreview.removeAttribute("src");
     }
   }
-  if (imageInput) {
-    imageInput.addEventListener("input", updateImagePreview);
+  if (imageInput) imageInput.addEventListener("input", function () { setImageStatus(""); updateImagePreview(); });
+
+  if (imageRemoveBtn) imageRemoveBtn.addEventListener("click", function () {
+    imageInput.value = "";
+    if (fileInput) fileInput.value = "";
+    setImageStatus("");
+    updateImagePreview();
+  });
+
+  /* Perkecil di browser supaya unggahan ringan. Rasio tidak diubah (tidak gepeng);
+     PNG/WebP transparan tetap transparan. Jika gagal, pakai file asli. */
+  function shrinkImage(file) {
+    return new Promise(function (resolve) {
+      if (file.type === "image/gif") return resolve(file); // jangan rusak animasi
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        var w = img.naturalWidth, h = img.naturalHeight;
+        var scale = Math.min(1, MAX_SIDE / Math.max(w, h));
+        if (scale === 1 && file.size <= 600 * 1024) return resolve(file);
+        var c = document.createElement("canvas");
+        c.width = Math.max(1, Math.round(w * scale));
+        c.height = Math.max(1, Math.round(h * scale));
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        var keepAlpha = file.type === "image/png" || file.type === "image/webp";
+        var outType = keepAlpha ? "image/webp" : "image/jpeg";
+        c.toBlob(function (blob) {
+          if (!blob || blob.type !== outType || blob.size >= file.size && scale === 1) return resolve(file);
+          resolve(blob);
+        }, outType, 0.85);
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); resolve(file); };
+      img.src = url;
+    });
   }
+
+  if (fileInput) fileInput.addEventListener("change", function () {
+    var file = fileInput.files && fileInput.files[0];
+    if (!file) return;
+    if (!/^image\/(jpeg|png|webp|gif)$/.test(file.type)) {
+      setImageStatus("Format harus JPG, PNG, WebP, atau GIF.", true);
+      fileInput.value = "";
+      return;
+    }
+    if (file.size > MAX_UPLOAD_BYTES) {
+      setImageStatus("Ukuran file terlalu besar (maksimal 8 MB).", true);
+      fileInput.value = "";
+      return;
+    }
+    uploading = true;
+    submitBtn.disabled = true;
+    setImageStatus("Mengunggah foto…");
+    shrinkImage(file).then(function (ready) {
+      var toSend = (ready instanceof Blob && !(ready instanceof File))
+        ? new File([ready], file.name, { type: ready.type }) : ready;
+      return OD.uploadProductImage(toSend);
+    }).then(function (publicUrl) {
+      imageInput.value = publicUrl;
+      updateImagePreview();
+      setImageStatus("Foto berhasil diunggah. Klik simpan untuk menerapkan ke produk.");
+    }).catch(function (err) {
+      console.error(err);
+      setImageStatus("Gagal mengunggah: " + friendlyError(err), true);
+    }).finally(function () {
+      uploading = false;
+      submitBtn.disabled = false;
+      fileInput.value = "";
+    });
+  });
 
   function resetForm() {
     form.reset();
@@ -138,7 +218,11 @@
     submitBtn.textContent = "Tambah produk";
     submitBtnDefaultText = "Tambah produk";
     cancelBtn.hidden = true;
+    originalImage = "";
+    if (fileInput) fileInput.value = "";
+    setImageStatus("");
     updateImagePreview();
+    form.scrollTop = 0;
   }
 
   function fillFormForEdit(i) {
@@ -151,11 +235,15 @@
     $("f-stock").value = p.stock || 0;
     $("f-fits").value = fitsToText(p.fits);
     if (imageInput) imageInput.value = p.image || "";
+    originalImage = p.image || "";
+    if (fileInput) fileInput.value = "";
+    setImageStatus("");
     formTitle.textContent = "Ubah produk";
     submitBtn.textContent = "Simpan perubahan";
     submitBtnDefaultText = "Simpan perubahan";
     cancelBtn.hidden = false;
     updateImagePreview();
+    form.scrollTop = 0;
     form.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
@@ -174,7 +262,13 @@
       image: imageInput ? (imageInput.value.trim() || null) : undefined
     };
     if (!data.name) { $("f-name").focus(); return; }
+    if (uploading) { toast("Tunggu, foto masih diunggah…"); return; }
     if (data.image === undefined) delete data.image;
+    if (data.image && !/^https?:\/\//i.test(data.image) && data.image !== originalImage) {
+      setImageStatus("URL foto harus diawali http:// atau https://, atau unggah file foto.", true);
+      imageInput.focus();
+      return;
+    }
 
     submitBtn.disabled = true;
     submitBtn.textContent = "Menyimpan…";
