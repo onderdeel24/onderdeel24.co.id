@@ -1,460 +1,423 @@
-(function () {
-  "use strict";
+  /* Kunci ke tema terang: cegah dark mode / force-dark perangkat mengubah tampilan */
+  :root { color-scheme: only light; }
+  html { color-scheme: only light; background-color: #FFFFFF; }
 
-  /* ====== PENGATURAN TOKO: sesuaikan dengan tokomu ======
-     Asumsi jam buka: Senin-Sabtu 08.00-20.00, Minggu 09.00-17.00.
-     Ganti sesuai jam buka toko yang sebenarnya. */
-  var WA_NUMBER = "6287869290359";
-  var HOURS = [
-    { day: "Senin",  open: "08:00", close: "20:00" },
-    { day: "Selasa", open: "08:00", close: "20:00" },
-    { day: "Rabu",   open: "08:00", close: "20:00" },
-    { day: "Kamis",  open: "08:00", close: "20:00" },
-    { day: "Jumat",  open: "08:00", close: "20:00" },
-    { day: "Sabtu",  open: "08:00", close: "20:00" },
-    { day: "Minggu", open: "08:00", close: "20:00" }
-  ];
-
-  function toMin(t) { var p = t.split(":"); return (+p[0]) * 60 + (+p[1]); }
-  function isOpenNow() {
-    var now = new Date();
-    var idx = (now.getDay() + 6) % 7; // Senin = 0
-    var h = HOURS[idx];
-    var mins = now.getHours() * 60 + now.getMinutes();
-    return mins >= toMin(h.open) && mins < toMin(h.close);
+  :root {
+    --orange: #FF5200;
+    --orange-btn: #D63D00;
+    --orange-btn-hover: #B93400;
+    --orange-soft: #FFE5D6;
+    --navy: #08087A;
+    --bg: #FFFFFF;
+    --surface: #FFFFFF;
+    --tint: #FFFFFF;
+    --grad-page: linear-gradient(180deg, #FFFFFF 0%, #F7F8FC 55%, #FFFFFF 100%);
+    --grad-hero: linear-gradient(150deg, #FFFFFF 0%, #FFF4EC 45%, #FFFFFF 100%);
+    --grad-surface: linear-gradient(160deg, #FFFFFF 0%, #FBFBFE 100%);
+    --grad-tint: linear-gradient(180deg, #FFFFFF 0%, #F4F5FA 100%);
+    --grad-card: linear-gradient(165deg, #FFFFFF 0%, #FCFCFE 100%);
+    --grad-cta: linear-gradient(135deg, #FFFFFF 0%, #F1F3FB 55%, #FFFFFF 100%);
+    --ink: #17173A;
+    --muted: #5B5B78;
+    --line: #E7E7EC;
+    --wordmark: #08087A;
+    --footer: #08087A;
+    --focus: #08087A;
+    --night: #0E0E3A;
+    --shadow: 0 1px 0 rgba(8,8,122,.04), 0 8px 24px rgba(8,8,122,.07);
+    --font-display: "Montserrat", "Arial Black", "Segoe UI", sans-serif;
+    --font-body: "Figtree", "Segoe UI", Roboto, Arial, sans-serif;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
-  function todayIdx() { return (new Date().getDay() + 6) % 7; }
+  /* Situs ini dikunci ke tema terang (putih) dan tidak mengikuti
+     pengaturan dark mode perangkat pengunjung. */
+  input, select, textarea, button { color-scheme: only light; }
 
-  /* ====== FOTO KATEGORI ======
-     Ini foto ikon untuk tombol/kartu KATEGORI (beda dari foto produk).
-     Sesuaikan path-nya dengan file yang ada di folder assets/kategori/. */
-  var ICONS = {
-    rem: "assets/kategori/kampasrem.png",
-    oli: "assets/kategori/oli.png",
-    filter: "assets/kategori/filter.png",
-    listrik: "assets/kategori/aki.png",
-    suspensi: "assets/kategori/kopling.png",
-    kampas: "assets/kategori/kampas.png",
-    busi: "assets/kategori/busi.png",
-    kopling: "assets/kategori/kopling.png",
-  };
-
-  /* Pemetaan id kategori (dari CATS di products-data.js) ke kunci di ICONS */
-  var ICON_BY_CAT = {
-    rem: "rem",
-    oli: "oli",
-    filter: "filter",
-    kelistrikan: "listrik",
-    kampas: "kampas",
-    pengapian: "busi",
-    kopling: "kopling",
-  };
-
-  /* Foto untuk KATEGORI (dipakai di tombol kategori & preview beranda) */
-  function catIcon(catId) {
-    var key = ICON_BY_CAT[catId] || catId;
-    var src = ICONS[key];
-    if (!src) {
-      console.warn("Foto kategori tidak ditemukan untuk:", catId);
-      return "";
-    }
-    return '<img src="' + src + '" class="category-icon" alt="">';
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 84px); scroll-behavior: smooth; }
+  html.locked { overflow: hidden; }
+  body {
+    margin: 0;
+    background: var(--grad-page);
+    background-attachment: fixed;
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
   }
+  img, svg { max-width: 100%; }
+  a { color: inherit; }
+  button, select, input { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .hero :focus-visible, .cta :focus-visible { outline-color: var(--navy); }
+  .site-footer :focus-visible, .strip :focus-visible { outline-color: #FFB48F; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .wrap { width: min(1180px, 100% - 40px); margin-inline: auto; }
 
-  /* Foto untuk PRODUK (dipakai di kartu katalog & item keranjang).
-     Diambil dari kolom "image" milik produk itu sendiri di Supabase.
-     Kalau produk belum ada fotonya, jatuh ke foto kategori sebagai cadangan. */
-  function productIcon(p) {
-    if (p && p.image) {
-      return '<img src="' + p.image + '" class="product-icon" alt="" onerror="this.style.visibility=\'hidden\'">';
-    }
-    console.warn("Foto produk tidak ditemukan untuk:", p && p.id, "- pakai foto kategori sebagai cadangan");
-    return catIcon(p && p.cat);
+  /* ---------- Wordmark / logo ---------- */
+  .brand { display: inline-flex; align-items: center; text-decoration: none; }
+  .brand-logo { height: 30px; width: auto; flex: none; display: block; }
+  .footer-logo { height: 30px; }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 46px; padding: 0 22px;
+    border: 0; border-radius: 10px;
+    background: linear-gradient(160deg, var(--orange) 0%, var(--orange-btn) 100%); color: #fff;
+    font-family: var(--font-display); font-weight: 700; font-size: .95rem;
+    text-decoration: none; cursor: pointer;
+    transition: background-color .15s ease, transform .1s ease, filter .15s ease;
   }
+  .btn:hover { filter: brightness(0.94); }
+  .btn:active { transform: translateY(1px); }
+  .btn.navy { background: linear-gradient(160deg, #14146E 0%, var(--navy) 100%); }
+  .btn.navy:hover { filter: brightness(1.15); }
+  .btn.sm { min-height: 38px; padding: 0 60px; font-size: .85rem; border-radius: 8px; justify-content: center; }
+  .btn.ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 2px var(--line); }
+  .btn.ghost:hover { background: var(--tint); }
+  .btn[aria-disabled="true"] { opacity: .45; pointer-events: none; }
 
-  /* ====== DATA (dari products-data.js, diambil dari Supabase) ====== */
-  var OD = window.OD24_DATA;
-  var CATS = OD.CATS;
-  var CAT_BY_ID = OD.CAT_BY_ID;
-  var MAKES = OD.MAKES;
-  var PRODUCTS = [];
-  var PROD_BY_ID = {};
-
-  /* ====== UTIL ====== */
-  function rp(n) { return "Rp " + Number(n).toLocaleString("id-ID"); }
-  function $(id) { return document.getElementById(id); }
-  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-
-  function fitText(p) {
-    if (!p.fits) return "Cocok untuk beberapa tipe mobil, dicek langsung saat kunjungan atau chat";
-    var byMake = {}, order = [];
-    p.fits.forEach(function (f) {
-      if (!byMake[f[0]]) { byMake[f[0]] = []; order.push(f[0]); }
-      byMake[f[0]].push(f[1]);
-    });
-    return "Cocok untuk " + order.map(function (m) { return m + " " + byMake[m].join(", "); }).join("; ");
+  .site-header {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30;
+    background: var(--grad-surface);
+    border-bottom: 1px solid var(--line);
   }
-
-  /* ====== STATE ====== */
-  var state = { cat: "all", q: "", sort: "rek" };
-  var loaded = false;
-  var loadError = false;
-
-  function matches(p) {
-    if (state.cat !== "all" && p.cat !== state.cat) return false;
-    if (state.q) {
-      var hay = (p.name + " " + p.tag + " " + fitText(p) + " " + CAT_BY_ID[p.cat].name).toLowerCase();
-      if (hay.indexOf(state.q.toLowerCase()) === -1) return false;
-    }
-    return true;
+  .site-header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 72px; position: relative; }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .nav { display: flex; gap: 28px; }
+  .nav a { text-decoration: none; font-weight: 600; font-size: .95rem; padding: 6px 0; border-bottom: 3px solid transparent; }
+  .nav a:hover { border-bottom-color: var(--orange); }
+  .nav a[aria-current="page"] { color: var(--orange-btn); border-bottom-color: var(--orange); }
+  .mobile-nav a[aria-current="page"] { color: var(--orange-btn); }
+  .nav-toggle {
+    display: none; width: 46px; height: 46px; border-radius: 10px; border: 2px solid var(--line);
+    background: var(--surface); cursor: pointer; flex: none;
+    align-items: center; justify-content: center;
   }
-
-  /* ====== RENDER: kategori ====== */
-  function renderCats() {
-    var el = $("cats");
-    if (!el) return;
-    var html = CATS.map(function (c) {
-      var n = PRODUCTS.filter(function (p) { return p.cat === c.id; }).length;
-      return '<button class="cat" type="button" data-cat="' + c.id + '" aria-pressed="' + (state.cat === c.id) + '">' +
-        '<span class="ico-box">' + catIcon(c.id) + '</span>' +
-        '<span><strong>' + esc(c.name) + '</strong><small>' + n + ' produk</small></span></button>';
-    }).join("");
-    el.innerHTML = html;
+  .nav-toggle svg { width: 22px; height: 22px; }
+  .nav-toggle .icon-close { display: none; }
+  .nav-toggle[aria-expanded="true"] .icon-open { display: none; }
+  .nav-toggle[aria-expanded="true"] .icon-close { display: block; }
+  .mobile-nav {
+    display: none;
+    position: absolute; left: 0; right: 0; top: 100%;
+    background: var(--surface); border-bottom: 1px solid var(--line);
+    box-shadow: 0 16px 32px rgba(8,8,60,.12);
+    padding: 8px 0 14px;
   }
-
-  /* ====== RENDER: preview kategori (beranda) — tautan langsung ke katalog ====== */
-  function renderCatsPreview() {
-    var el = $("cats-preview");
-    if (!el) return;
-    var html = CATS.map(function (c) {
-      var n = PRODUCTS.filter(function (p) { return p.cat === c.id; }).length;
-      return '<a class="cat" href="katalog.html?cat=' + c.id + '">' +
-        '<span class="ico-box">' + catIcon(c.id) + '</span>' +
-        '<span><strong>' + esc(c.name) + '</strong><small>' + n + ' produk</small></span></a>';
-    }).join("");
-    el.innerHTML = html;
+  .mobile-nav.open { display: block; }
+  .mobile-nav a {
+    display: block; padding: 14px 4px; margin-inline: 20px;
+    text-decoration: none; font-weight: 700; font-size: 1.02rem;
+    border-bottom: 1px solid var(--line);
   }
-
-  /* ====== RENDER: produk ====== */
-  function renderProducts() {
-    var gridEl = $("grid");
-    if (!gridEl) return;
-    var list = PRODUCTS.filter(matches);
-    if (state.sort === "murah") list.sort(function (a, b) { return a.price - b.price; });
-    if (state.sort === "mahal") list.sort(function (a, b) { return b.price - a.price; });
-    if (state.sort === "nama") list.sort(function (a, b) { return a.name.localeCompare(b.name, "id"); });
-
-    if (!list.length) {
-      if (!loaded) {
-        gridEl.innerHTML = '<div class="empty"><h3>Memuat katalog…</h3>' +
-          '<p>Sebentar, kami sedang mengambil data produk terbaru.</p></div>';
-      } else if (loadError) {
-        gridEl.innerHTML = '<div class="empty"><h3>Katalog gagal dimuat</h3>' +
-          '<p>Koneksi ke database bermasalah, atau Supabase belum dikonfigurasi. Coba muat ulang halaman.</p></div>';
-      } else {
-        gridEl.innerHTML = '<div class="empty"><h3>Belum ada part yang cocok</h3>' +
-          '<p>Coba hapus sebagian filter, atau tanyakan langsung ke tim kami.</p>' +
-          '<button class="btn" type="button" data-action="reset">Hapus semua filter</button></div>';
-      }
-    } else {
-      gridEl.innerHTML = list.map(function (p) {
-        var out = (p.stock || 0) <= 0;
-        return '<article class="card">' +
-          '<div class="card-art"><span class="badge ' + (p.tag === "OEM" ? "ori" : "") + '">' + p.tag + '</span>' + productIcon(p) + '</div>' +
-          '<div class="card-body"><h3>' + esc(p.name) + '</h3><p class="fit">' + esc(fitText(p)) + '</p>' +
-          '<p class="stock ' + (out ? "out" : "") + '">' + (out ? "Stok habis" : "Stok: " + p.stock) + '</p>' +
-          '<div class="card-foot"><strong class="price">' + rp(p.price) + '</strong>' +
-          '<button class="btn sm" type="button" data-add="' + p.id + '" ' + (out ? 'disabled aria-disabled="true"' : '') + ' aria-label="Tambah ' + esc(p.name) + ' ke daftar belanja">' + (out ? "Stok habis" : "Tambah") + '</button></div></div></article>';
-      }).join("");
-    }
-
-    var filtered = state.cat !== "all" || state.q;
-    var txt = "<strong>" + list.length + " produk</strong>";
-    if (state.cat !== "all") txt += " di kategori " + esc(CAT_BY_ID[state.cat].name.toLowerCase());
-    var statusEl = $("status-text");
-    if (statusEl) statusEl.innerHTML = txt;
-    var resetEl = $("reset");
-    if (resetEl) resetEl.hidden = !filtered;
-
-    document.querySelectorAll(".cat[data-cat]").forEach(function (b) {
-      b.setAttribute("aria-pressed", String(b.dataset.cat === state.cat));
-    });
+  .mobile-nav a:last-child { border-bottom: 0; }
+  .cart-btn {
+    position: relative; display: inline-flex; align-items: center; gap: 10px;
+    min-height: 46px; padding: 0 18px;
+    border: 0; border-radius: 10px; background: var(--orange-btn); color: #fff;
+    font-family: var(--font-display); font-weight: 700; font-size: .92rem; cursor: pointer;
+    transition: background-color .15s ease;
   }
-
-  /* ====== TOOLBAR ====== */
-  var qEl = $("q"), sortEl = $("sort"), resetBtn = $("reset");
-  if (qEl) qEl.addEventListener("input", function (e) { state.q = e.target.value.trim(); renderProducts(); });
-  if (sortEl) sortEl.addEventListener("change", function (e) { state.sort = e.target.value; renderProducts(); });
-  function resetFilters() {
-    state = { cat: "all", q: "", sort: state.sort };
-    if (qEl) qEl.value = "";
-    renderProducts();
+  .cart-btn:hover { background: var(--orange-btn-hover); }
+  .cart-btn svg { width: 20px; height: 20px; }
+  .cart-count {
+    min-width: 24px; height: 24px; padding: 0 7px; border-radius: 12px;
+    background: #fff; color: var(--orange-btn);
+    display: inline-grid; place-items: center; font-size: .8rem;
   }
-  if (resetBtn) resetBtn.addEventListener("click", resetFilters);
+  .cart-count.bump { animation: bump .3s ease; }
+  @keyframes bump { 40% { transform: scale(1.25); } }
 
-  /* ====== KATALOG: baca ?cat= dari URL (dari tautan kategori di beranda) ====== */
-  (function initCatFromUrl() {
-    if (!$("grid")) return;
-    var params = new URLSearchParams(window.location.search);
-    var cat = params.get("cat");
-    if (cat && CAT_BY_ID[cat]) state.cat = cat;
-  })();
-
-  /* ====== KERANJANG ====== */
-  var cart = {};
-  function restoreCart() {
-    try {
-      var saved = JSON.parse(localStorage.getItem("od24-cart") || "{}");
-      Object.keys(saved).forEach(function (k) { if (PROD_BY_ID[k] && saved[k] > 0) cart[k] = Math.min(99, saved[k] | 0); });
-    } catch (e) { /* penyimpanan tidak tersedia */ }
+  /* ---------- Hero ---------- */
+  .hero { position: relative; overflow: hidden; background: var(--grad-hero); color: var(--ink); isolation: isolate; border-bottom: 1px solid var(--line); }
+  .hero-gear {
+    position: absolute; z-index: -1; right: -180px; bottom: -220px;
+    width: 720px; height: 720px; color: var(--orange); opacity: .08;
+    animation: spin 90s linear infinite;
   }
-  function persist() { try { localStorage.setItem("od24-cart", JSON.stringify(cart)); } catch (e) {} }
-
-  var drawer = $("drawer"), overlay = $("overlay"), lastFocus = null;
-  function cartCount() { return Object.keys(cart).reduce(function (s, k) { return s + cart[k]; }, 0); }
-  function cartTotal() { return Object.keys(cart).reduce(function (s, k) { return s + cart[k] * PROD_BY_ID[k].price; }, 0); }
-
-  function waLink(text) { return "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(text); }
-
-  function renderCart(bump) {
-    var badge = $("cart-count");
-    if (!badge) return;
-    var n = cartCount(), ids = Object.keys(cart);
-    badge.textContent = n;
-    badge.setAttribute("aria-label", n + " barang");
-    if (bump) { badge.classList.remove("bump"); void badge.offsetWidth; badge.classList.add("bump"); }
-
-    var open = isOpenNow();
-    $("drawer-mode-note").textContent = open
-      ? "Toko sedang buka. Kamu bisa datang langsung, atau kirim daftar ini lewat WhatsApp lebih dulu."
-      : "Toko sedang tutup. Kirim daftar ini lewat WhatsApp, kami balas begitu toko buka.";
-
-    if (!ids.length) {
-      $("drawer-body").innerHTML = '<div class="drawer-empty"><h3>Daftar belanja masih kosong</h3><p>Pilih sparepart dari katalog, lalu kembali ke sini.</p><button class="btn" type="button" data-action="browse">Lihat katalog</button></div>';
-    } else {
-      $("drawer-body").innerHTML = ids.map(function (k) {
-        var p = PROD_BY_ID[k];
-        return '<div class="line-item"><div class="line-art">' + productIcon(p) + '</div><div>' +
-          '<h3>' + esc(p.name) + '</h3>' +
-          '<div class="line-meta"><div class="qty"><button type="button" data-dec="' + k + '" aria-label="Kurangi jumlah ' + esc(p.name) + '">&minus;</button><span aria-live="polite">' + cart[k] + '</span><button type="button" data-inc="' + k + '" aria-label="Tambah jumlah ' + esc(p.name) + '">+</button></div>' +
-          '<strong class="price">' + rp(p.price * cart[k]) + '</strong></div>' +
-          '<button class="link-btn" type="button" data-remove="' + k + '">Hapus</button></div></div>';
-      }).join("");
-    }
-
-    $("subtotal").textContent = rp(cartTotal());
-    var co = $("checkout");
-    if (!ids.length) {
-      co.setAttribute("aria-disabled", "true");
-      co.setAttribute("tabindex", "-1");
-      co.href = "#";
-      co.textContent = "Kirim daftar ke WhatsApp";
-    } else {
-      var lines = ids.map(function (k, i) {
-        var p = PROD_BY_ID[k];
-        return (i + 1) + ". " + p.name + " x" + cart[k] + " = " + rp(p.price * cart[k]);
-      });
-      var greeting = open
-        ? "Halo ONDERDEEL24, saya mau tanya ketersediaan part berikut sebelum datang ke toko:"
-        : "Halo ONDERDEEL24, toko sepertinya sedang tutup. Saya ingin memesan part berikut, mohon dikonfirmasi begitu toko buka:";
-      var msg = greeting + "\n\n" + lines.join("\n") + "\n\nPerkiraan total: " + rp(cartTotal()) + "\n\nNama:\nMobil (merek, model, tahun):";
-      co.href = waLink(msg);
-      co.setAttribute("aria-disabled", "false");
-      co.removeAttribute("tabindex");
-      co.textContent = open ? "Tanyakan lewat WhatsApp" : "Kirim daftar ke WhatsApp";
-    }
-    persist();
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .hero .wrap { display: grid; grid-template-columns: 1.15fr .85fr; gap: 56px; align-items: center; padding-block: 64px 76px; }
+  .hero h1 {
+    margin: 0 0 18px;
+    font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(2.2rem, 5vw, 3.8rem); line-height: 1.05; letter-spacing: -0.025em;
+    max-width: 15ch;
   }
+  .hero p.lead { margin: 0 0 28px; font-size: 1.12rem; max-width: 46ch; font-weight: 500; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 
-  function openCart() {
-    lastFocus = document.activeElement;
-    drawer.inert = false;
-    drawer.classList.add("open");
-    overlay.classList.add("open");
-    document.documentElement.classList.add("locked");
-    $("close-cart").focus();
+  .visit-card {
+    background: var(--grad-surface); color: var(--ink);
+    border-radius: 18px; padding: 26px;
+    border: 1px solid var(--line);
+    box-shadow: 0 20px 48px rgba(8,8,122,.12);
   }
-  function closeCart() {
-    drawer.classList.remove("open");
-    overlay.classList.remove("open");
-    document.documentElement.classList.remove("locked");
-    drawer.inert = true;
-    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  .visit-card .when {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px; border-radius: 12px; margin-bottom: 18px;
+    font-weight: 700; font-size: .95rem;
   }
-  var openCartBtn = $("open-cart"), closeCartBtn = $("close-cart");
-  if (openCartBtn) openCartBtn.addEventListener("click", openCart);
-  if (closeCartBtn) closeCartBtn.addEventListener("click", closeCart);
-  if (overlay) overlay.addEventListener("click", closeCart);
+  .visit-card .when.open { background: #E8FBEF; color: #146C2E; }
+  .visit-card .when.closed { background: var(--orange-soft); color: var(--orange-btn); }
+  .visit-card .when svg { width: 20px; height: 20px; flex: none; }
+  .visit-card h2 { margin: 0 0 4px; font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; letter-spacing: -0.01em; }
+  .hours-list { list-style: none; margin: 0 0 18px; padding: 0; display: grid; gap: 6px; font-size: .92rem; }
+  .hours-list li { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; border-bottom: 1px dashed var(--line); }
+  .hours-list li.today { font-weight: 700; color: var(--orange-btn); }
+  .visit-card address { font-style: normal; color: var(--muted); font-size: .92rem; margin: 0 0 18px; }
+  .visit-actions { display: grid; gap: 10px; }
 
-  /* ====== NAVBAR MOBILE ====== */
-  var navToggle = $("nav-toggle"), mobileNav = $("mobile-nav");
-  function setNav(open) {
-    if (!navToggle || !mobileNav) return;
-    navToggle.setAttribute("aria-expanded", String(open));
-    navToggle.setAttribute("aria-label", open ? "Tutup menu" : "Buka menu");
-    mobileNav.classList.toggle("open", open);
+  /* ---------- Trust strip ---------- */
+  .strip { background: var(--grad-tint); color: var(--ink); border-block: 1px solid var(--line); }
+  .strip ul { list-style: none; margin: 0; padding: 16px 0; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 32px; }
+  .strip li { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: .95rem; }
+  .strip svg { width: 22px; height: 22px; color: var(--orange); flex: none; }
+
+  /* ---------- Distributor / mitra resmi ---------- */
+  .distributors { background: var(--grad-page); border-block: 1px solid var(--line); padding-block: 40px; }
+  .distributors .dist-head { text-align: center; margin-bottom: 26px; }
+  .distributors .dist-head p { margin: 0; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; font-size: .82rem; color: var(--muted); }
+  .dist-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 40px 56px; }
+  .dist-row img { height: 44px; width: auto; display: block; }
+
+  /* ---------- Sections ---------- */
+  .section { padding-block: 72px; }
+  .section.tint { background: var(--grad-tint); border-block: 1px solid var(--line); }
+  .section-head { display: flex; justify-content: space-between; align-items: end; gap: 20px; flex-wrap: wrap; margin-bottom: 28px; }
+  .section-head h2 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(1.7rem, 3.4vw, 2.4rem); letter-spacing: -0.02em; line-height: 1.1; }
+  .section-head p { margin: 6px 0 0; color: var(--muted); max-width: 52ch; }
+
+  /* Kenapa dua jalur layanan */
+  .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .mode { border-radius: 16px; padding: 26px; border: 2px solid var(--line); background: var(--grad-card); }
+  .mode.primary { border-color: var(--orange); background: var(--grad-card); }
+  .mode .tag { display: inline-block; font-size: .78rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: var(--orange); color: #fff; margin-bottom: 14px; }
+  .mode.night .tag { background: var(--navy); }
+  .mode h3 { margin: 0 0 8px; font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; }
+  .mode p { margin: 0 0 16px; color: var(--muted); }
+
+  /* Kategori */
+  .cats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .cat {
+    display: flex; align-items: center; gap: 14px; text-align: left;
+    padding: 18px; border-radius: 14px; cursor: pointer;
+    background: var(--grad-card); border: 2px solid var(--line);
+    text-decoration: none;
+    transition: border-color .15s ease, background-color .15s ease;
   }
-  if (navToggle && mobileNav) {
-    navToggle.addEventListener("click", function () {
-      setNav(navToggle.getAttribute("aria-expanded") !== "true");
-    });
-    mobileNav.querySelectorAll("a").forEach(function (a) {
-      a.addEventListener("click", function () { setNav(false); });
-    });
+  .cat:hover { border-color: var(--orange); }
+  .cat[aria-pressed="true"] { border-color: var(--orange); background: var(--grad-card); }
+  .cat .ico-box { width: 52px; height: 52px; border-radius: 12px; background: var(--orange); color: #fff; display: grid; place-items: center; flex: none; }
+  .cat .ico-box svg { width: 28px; height: 28px; }
+  .cat strong { display: block; font-family: var(--font-display); font-weight: 700; font-size: 1rem; line-height: 1.2; }
+  .cat small { color: var(--muted); font-size: .85rem; }
+
+  /* Toolbar */
+  .toolbar { display: grid; grid-template-columns: 1.4fr auto; gap: 12px; align-items: center; margin-bottom: 14px; }
+  .status { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 20px; min-height: 40px; color: var(--muted); }
+  .status strong { color: var(--ink); }
+  .link-btn { background: none; border: 0; padding: 6px 0; color: var(--orange-btn); font-weight: 700; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+
+  /* Form fields (dipakai katalog & admin) */
+  .field { display: grid; gap: 6px; margin-bottom: 14px; }
+  .field label { font-weight: 700; font-size: .9rem; }
+  .field .hint { font-weight: 400; color: var(--muted); font-size: .82rem; }
+  .input, .select, .textarea {
+    width: 100%; min-height: 46px; padding: 10px 14px;
+    border: 2px solid var(--line); border-radius: 10px; background: var(--surface);
+    font: inherit; color: inherit;
   }
-  document.addEventListener("keydown", function (e) {
-    if (navToggle && e.key === "Escape" && navToggle.getAttribute("aria-expanded") === "true") {
-      setNav(false);
-      navToggle.focus();
-    }
-  });
-  window.addEventListener("resize", function () {
-    if (window.innerWidth > 900) setNav(false);
-  });
-  document.addEventListener("keydown", function (e) {
-    if (!drawer) return;
-    if (e.key === "Escape" && drawer.classList.contains("open")) closeCart();
-    if (e.key === "Tab" && drawer.classList.contains("open")) {
-      var f = drawer.querySelectorAll('button, a[href]:not([aria-disabled="true"])');
-      if (!f.length) return;
-      var first = f[0], last = f[f.length - 1];
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-    }
-  });
+  .textarea { min-height: 90px; resize: vertical; font-family: monospace; font-size: .88rem; }
+  .input:focus, .select:focus, .textarea:focus { border-color: var(--orange); }
 
-  var toastTimer;
-  function toast(msg) {
-    var t = $("toast");
-    if (!t) return;
-    t.textContent = msg;
-    t.classList.add("show");
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { t.classList.remove("show"); }, 2200);
+  /* ---------- Panel admin ---------- */
+  .admin-gate { max-width: 420px; margin: 0 auto; text-align: center; }
+  .admin-gate .btn { width: 100%; margin-top: 6px; }
+  .admin-note { background: var(--tint); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin-bottom: 28px; font-size: .92rem; color: var(--muted); }
+  .admin-note strong { color: var(--ink); }
+  .admin-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  .admin-grid { display: grid; grid-template-columns: 1.1fr 1.4fr; gap: 32px; align-items: start; }
+  .admin-form { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px; position: sticky; top: 96px; max-height: calc(100vh - 116px); max-height: calc(100dvh - 116px); overflow-y: auto; overscroll-behavior: contain; }
+  .admin-form h3 { margin: 0 0 16px; font-family: var(--font-display); font-weight: 800; font-size: 1.1rem; }
+  .admin-form .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  /* Tombol Simpan/Tambah menempel di bawah form agar selalu terlihat saat form di-scroll */
+  .admin-form .actions { display: flex; gap: 10px; margin: 4px -22px -22px; padding: 14px 22px 22px; position: sticky; bottom: 0; z-index: 2; background: var(--surface); border-top: 1px solid var(--line); border-radius: 0 0 14px 14px; }
+  .admin-form .img-tools { display: grid; gap: 8px; }
+  .admin-form .img-status { margin: 0; font-size: .85rem; color: var(--muted); min-height: 1.2em; }
+  .admin-form .img-status.err { color: var(--orange-btn); font-weight: 700; }
+  .admin-form .img-preview { display: none; width: 100%; max-width: 200px; aspect-ratio: 4 / 3; object-fit: contain; background: var(--grad-tint); border: 1px solid var(--line); border-radius: 10px; }
+  .admin-form .img-remove { justify-self: start; }
+  .admin-list { display: grid; gap: 10px; }
+  .admin-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .admin-row.out { border-color: var(--orange-soft); background: #FFF8F4; }
+  .admin-row-main { display: grid; gap: 2px; }
+  .admin-row-main strong { font-family: var(--font-display); font-size: .98rem; }
+  .admin-row-main .muted { color: var(--muted); font-size: .85rem; }
+  .admin-row-actions { display: flex; gap: 8px; flex: none; }
+  .admin-thumb { width:48px; height:48px; object-fit:contain; background:#F4F5FA; border:1px solid var(--line); border-radius:6px; flex-shrink:0; }
+  .admin-thumb-empty { background:#eee; }
+  .admin-row-main { display:flex; gap:10px; align-items:center; }
+  .btn.danger { background: var(--orange-btn); }
+  .btn.danger:hover { background: #8f2900; }
+
+  /* Produk */
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .card { display: flex; flex-direction: column; background: var(--grad-card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); }
+  .card-art { position: relative; aspect-ratio: 4 / 3; background: var(--grad-tint); border-bottom: 1px solid var(--line); overflow: hidden; display: grid; place-items: center; color: var(--orange); }
+  /* Semua foto produk: kotak 4:3 yang sama, foto utuh (tidak dipotong/gepeng), dipusatkan */
+  .card-art .product-icon, .card-art .category-icon { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center; padding: 12px; box-sizing: border-box; }
+  .card-art .badge { z-index: 1; }
+  .card-art svg { width: 30%; height: auto; stroke-width: 1.5; }
+  .badge { position: absolute; top: 12px; left: 12px; padding: 4px 10px; border-radius: 999px; background: var(--surface); color: var(--ink); font-size: .78rem; font-weight: 700; border: 1px solid var(--line); }
+  .badge.ori { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .card-body { display: flex; flex-direction: column; gap: 6px; padding: 16px; flex: 1; }
+  .card h3 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 1rem; line-height: 1.3; }
+  .fit { margin: 0; color: var(--muted); font-size: .88rem; line-height: 1.4; }
+  .stock { margin: 2px 0 0; font-size: .82rem; font-weight: 700; color: #146C2E; }
+  .stock.out { color: var(--orange-btn); }
+  .btn[disabled] { opacity: .5; cursor: not-allowed; }
+  .card-foot { margin-top: auto; padding-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .price { font-family: var(--font-display); font-weight: 800; font-size: 1.05rem; letter-spacing: -0.01em; }
+  .empty { grid-column: 1 / -1; text-align: center; padding: 56px 20px; border: 2px dashed var(--line); border-radius: 14px; }
+  .empty h3 { margin: 0 0 6px; font-family: var(--font-display); font-weight: 800; font-size: 1.3rem; }
+  .empty p { margin: 0 0 16px; color: var(--muted); }
+
+  /* Steps + FAQ */
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; }
+  .split h2 { margin: 0 0 24px; font-family: var(--font-display); font-weight: 800; font-size: clamp(1.6rem, 3vw, 2.1rem); letter-spacing: -0.02em; line-height: 1.1; }
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; counter-reset: s; }
+  .steps li { display: grid; grid-template-columns: 52px 1fr; gap: 16px; align-items: start; counter-increment: s; }
+  .steps li::before {
+    content: counter(s);
+    width: 52px; height: 52px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: var(--orange); color: var(--navy);
+    font-family: var(--font-display); font-weight: 800; font-size: 1.4rem;
   }
+  .steps h3 { margin: 4px 0 2px; font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; }
+  .steps p { margin: 0; color: var(--muted); }
+  details { border-bottom: 1px solid var(--line); }
+  details:first-of-type { border-top: 1px solid var(--line); }
+  summary { list-style: none; cursor: pointer; padding: 18px 40px 18px 0; position: relative; font-weight: 700; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; position: absolute; right: 4px; top: 50%; transform: translateY(-50%); font-size: 1.6rem; color: var(--orange); font-weight: 600; transition: transform .2s ease; }
+  details[open] summary::after { transform: translateY(-50%) rotate(45deg); }
+  details p { margin: 0 0 18px; color: var(--muted); max-width: 60ch; }
 
-  /* ====== EVENT DELEGASI ====== */
-  document.addEventListener("click", function (e) {
-    var t = e.target.closest("[data-add],[data-inc],[data-dec],[data-remove],[data-cat],[data-action]");
-    if (!t) return;
+  /* CTA malam hari */
+  .cta { position: relative; overflow: hidden; background: var(--grad-cta); color: var(--ink); isolation: isolate; border-block: 1px solid var(--line); }
+  .cta .wrap { display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; padding-block: 56px; }
+  .cta .eyebrow { display: inline-flex; align-items: center; gap: 8px; color: var(--orange-btn); font-weight: 700; margin-bottom: 10px; font-size: .95rem; }
+  .cta .eyebrow svg { width: 20px; height: 20px; }
+  .cta h2 { margin: 0 0 6px; font-family: var(--font-display); font-weight: 800; font-size: clamp(1.6rem, 3.2vw, 2.3rem); letter-spacing: -0.02em; line-height: 1.15; max-width: 24ch; color: var(--ink); }
+  .cta p { margin: 0; font-size: 1.05rem; font-weight: 500; max-width: 48ch; color: var(--muted); }
 
-    if (t.dataset.add) {
-      var id = t.dataset.add;
-      var stockAdd = PROD_BY_ID[id].stock || 0;
-      if (stockAdd <= 0) return;
-      cart[id] = Math.min(stockAdd, 99, (cart[id] || 0) + 1);
-      renderCart(true);
-      toast(PROD_BY_ID[id].name + " masuk daftar belanja");
-    } else if (t.dataset.inc) {
-      var stockInc = PROD_BY_ID[t.dataset.inc].stock || 0;
-      cart[t.dataset.inc] = Math.min(stockInc, 99, cart[t.dataset.inc] + 1);
-      renderCart(true);
-    } else if (t.dataset.dec) {
-      cart[t.dataset.dec] -= 1;
-      if (cart[t.dataset.dec] <= 0) delete cart[t.dataset.dec];
-      renderCart(false);
-    } else if (t.dataset.remove) {
-      delete cart[t.dataset.remove];
-      renderCart(false);
-    } else if (t.dataset.cat) {
-      state.cat = (t.tagName === "BUTTON" && state.cat === t.dataset.cat) ? "all" : t.dataset.cat;
-      renderProducts();
-      if (t.tagName === "BUTTON") {
-        var produkEl = $("produk");
-        if (produkEl) produkEl.scrollIntoView();
-      }
-    } else if (t.dataset.action === "reset") {
-      resetFilters();
-    } else if (t.dataset.action === "browse") {
-      closeCart();
-      var produkEl2 = $("produk");
-      if (produkEl2) { produkEl2.scrollIntoView(); }
-      else { window.location.href = "katalog.html"; }
-    }
-  });
+  /* Footer */
+  .site-footer { background: var(--grad-tint); color: var(--ink); padding-block: 56px 28px; border-top: 1px solid var(--line); }
+  .foot-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 40px; }
+  .site-footer p { margin: 14px 0 0; max-width: 34ch; color: var(--muted); }
+  .site-footer h3 { margin: 0 0 12px; font-family: var(--font-display); font-weight: 700; font-size: 1rem; color: var(--navy); }
+  .site-footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .site-footer a { text-decoration: none; color: var(--ink); opacity: .85; }
+  .site-footer a:hover { text-decoration: underline; opacity: 1; color: var(--orange-btn); }
+  .site-footer .hrs { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); }
+  .copy { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); font-size: .88rem; color: var(--muted); }
 
-  /* ====== JAM BUKA: render status ====== */
-  function renderHours() {
-    var idx = todayIdx();
-    var html = HOURS.map(function (h, i) {
-      return '<li class="' + (i === idx ? "today" : "") + '"><span>' + h.day + '</span><span>' + h.open + '\u2013' + h.close + '</span></li>';
-    }).join("");
-    var hoursListEl = $("hours-list");
-    if (hoursListEl) hoursListEl.innerHTML = html;
-    var footHoursEl = $("foot-hours");
-    if (footHoursEl) {
-      footHoursEl.innerHTML = HOURS.map(function (h, i) {
-        return '<li class="hrs"><span>' + h.day + '</span><span>' + h.open + '\u2013' + h.close + '</span></li>';
-      }).join("");
-    }
+  /* Cart drawer */
+  .overlay { position: fixed; inset: 0; z-index: 40; background: rgba(8,8,60,.55); opacity: 0; visibility: hidden; transition: opacity .2s ease, visibility .2s; }
+  .overlay.open { opacity: 1; visibility: visible; }
+  .drawer {
+    position: fixed; z-index: 50; top: 0; right: 0; bottom: 0;
+    width: min(440px, 100%);
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: var(--grad-surface); color: var(--ink);
+    display: flex; flex-direction: column;
+    transform: translateX(100%); visibility: hidden;
+    transition: transform .25s ease, visibility .25s;
+    box-shadow: -20px 0 50px rgba(8,8,60,.25);
   }
+  .drawer.open { transform: none; visibility: visible; }
+  .drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid var(--line); }
+  .drawer-head h2 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 1.3rem; }
+  .icon-btn { width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; display: grid; place-items: center; }
+  .icon-btn:hover { background: var(--orange-soft); }
+  .icon-btn svg { width: 20px; height: 20px; }
+  .drawer-note { margin: 0; padding: 12px 22px; font-size: .85rem; color: var(--muted); background: #FAFAFC; border-bottom: 1px solid var(--line); }
+  .drawer-body { flex: 1; overflow-y: auto; padding: 8px 22px; }
+  .line-item { display: grid; grid-template-columns: 56px 1fr; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .line-art { width: 56px; height: 56px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); color: var(--orange); display: grid; place-items: center; }
+  .line-art svg { width: 28px; height: 28px; }
+  .line-art { overflow: hidden; }
+  .line-art .product-icon, .line-art .category-icon { width: 100%; height: 100%; object-fit: contain; object-position: center; padding: 4px; box-sizing: border-box; }
+  .line-item h3 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: .95rem; line-height: 1.3; }
+  .line-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; gap: 10px; }
+  .qty { display: inline-flex; align-items: center; border: 2px solid var(--line); border-radius: 10px; }
+  .qty button { width: 38px; height: 38px; border: 0; background: none; cursor: pointer; font-size: 1.2rem; font-weight: 700; border-radius: 8px; }
+  .qty button:hover { background: var(--tint); }
+  .qty span { min-width: 28px; text-align: center; font-weight: 700; }
+  .drawer-empty { padding: 48px 8px; text-align: center; color: var(--muted); }
+  .drawer-empty h3 { margin: 0 0 6px; color: var(--ink); font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; }
+  .drawer-empty .btn { margin-top: 14px; }
+  .drawer-foot { padding: 18px 22px 22px; border-top: 1px solid var(--line); display: grid; gap: 12px; }
+  .total { display: flex; justify-content: space-between; align-items: baseline; font-weight: 600; }
+  .total strong { font-family: var(--font-display); font-weight: 800; font-size: 1.4rem; }
+  .note { margin: 0; font-size: .85rem; color: var(--muted); }
 
-  function renderOpenState() {
-    var open = isOpenNow();
-    var idx = todayIdx();
-    var h = HOURS[idx];
-
-    var when = $("visit-when");
-    if (when) {
-      when.className = "when " + (open ? "open" : "closed");
-      var whenText = $("visit-when-text");
-      if (whenText) {
-        whenText.textContent = open
-          ? "Toko sedang buka sampai jam " + h.close + " hari ini"
-          : "Toko sedang tutup. Buka lagi jam " + h.open + " (" + h.day + ")";
-      }
-    }
+  .toast {
+    position: fixed; z-index: 60; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
+    background: var(--navy); color: #fff; padding: 12px 18px; border-radius: 10px;
+    font-weight: 600; box-shadow: 0 10px 30px rgba(8,8,60,.35);
+    transition: opacity .2s ease, transform .2s ease; max-width: calc(100% - 32px);
   }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-  /* ====== INIT ====== */
-  var waGreetOpen = "Halo ONDERDEEL24, saya ingin menanyakan sparepart mobil.";
-  var waGreetClosed = "Halo ONDERDEEL24, saya tahu toko sedang tutup. Saya ingin menanyakan sparepart untuk mobil saya, mohon dibalas saat toko buka.";
-  function waGreeting() { return isOpenNow() ? waGreetOpen : waGreetClosed; }
-
-  function refreshWaLinks() {
-    ["cta-wa", "foot-wa", "mode-wa", "visit-wa"].forEach(function (id) {
-      var el = $(id);
-      if (el) el.href = waLink(waGreeting());
-    });
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1080px) {
+    .grid { grid-template-columns: repeat(3, 1fr); }
+    .cats { grid-template-columns: repeat(2, 1fr); }
   }
-
-  function init() {
-    refreshWaLinks();
-    renderHours();
-    renderOpenState();
-    renderCats();
-    renderCatsPreview();
-    renderProducts(); // tampilkan status "memuat katalog…" dulu
-
-    OD.fetchProducts().then(function (list) {
-      PRODUCTS = list;
-      PROD_BY_ID = {};
-      PRODUCTS.forEach(function (p) { PROD_BY_ID[p.id] = p; });
-      loaded = true;
-      loadError = false;
-      restoreCart();
-      renderCats();
-      renderCatsPreview();
-      renderProducts();
-      renderCart(false);
-    }).catch(function (err) {
-      console.error(err);
-      loaded = true;
-      loadError = true;
-      renderProducts();
-      renderCart(false);
-      if (err && err.od24NotConfigured) {
-        toast("Supabase belum dikonfigurasi — lihat products-data.js");
-      } else {
-        toast("Gagal memuat katalog dari database");
-      }
-    });
-
-    setInterval(function () {
-      renderOpenState();
-      refreshWaLinks();
-    }, 60000);
+  @media (max-width: 900px) {
+    .hero .wrap { grid-template-columns: 1fr; gap: 36px; padding-block: 44px 52px; }
+    .hero-gear { width: 520px; height: 520px; right: -200px; bottom: -160px; }
+    .split { grid-template-columns: 1fr; gap: 48px; }
+    .nav { display: none; }
+    .nav-toggle { display: inline-flex; }
+    .modes { grid-template-columns: 1fr; }
+    .foot-grid { grid-template-columns: 1fr 1fr; }
+    .foot-grid > :first-child { grid-column: 1 / -1; }
+    .admin-grid { grid-template-columns: 1fr; }
+    .admin-form { position: static; max-height: none; overflow: visible; }
+    .dist-row { gap: 28px 36px; }
+    .dist-row img { height: 34px; }
   }
-
-  init();
-})();
+  @media (max-width: 680px) {
+    .wrap { width: min(1180px, 100% - 28px); }
+    .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .card-body { padding: 12px; }
+    .card-foot { flex-direction: column; align-items: stretch; }
+    .cats { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .cat { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px; }
+    .section { padding-block: 52px; }
+    .brand-logo { height: 25px; }
+    .cart-btn .label { display: none; }
+    .toolbar { grid-template-columns: 1fr; }
+    .strip ul { flex-direction: column; }
+    .foot-grid { grid-template-columns: 1fr; }
+    .admin-form .row2 { grid-template-columns: 1fr; }
+    .admin-row { flex-direction: column; align-items: stretch; }
+    .admin-row-actions { justify-content: flex-end; }
+    .dist-row { gap: 20px 24px; }
+    .dist-row img { height: 28px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .hero-gear { animation: none; }
+    .drawer, .overlay, .toast, .cart-count.bump { transition: none; animation: none; }
+  }
