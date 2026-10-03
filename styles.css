@@ -1,3 +1,7 @@
+  /* Kunci ke tema terang: cegah dark mode / force-dark perangkat mengubah tampilan */
+  :root { color-scheme: only light; }
+  html { color-scheme: only light; background-color: #FFFFFF; }
+
   :root {
     --orange: #FF5200;
     --orange-btn: #D63D00;
@@ -27,8 +31,9 @@
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
-  /* Situs ini dikunci ke tema terang (putih) dan tidak lagi
-     mengikuti pengaturan dark mode perangkat pengunjung. */
+  /* Situs ini dikunci ke tema terang (putih) dan tidak mengikuti
+     pengaturan dark mode perangkat pengunjung. */
+  input, select, textarea, button { color-scheme: only light; }
 
   *, *::before, *::after { box-sizing: border-box; }
   html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 84px); scroll-behavior: smooth; }
@@ -71,7 +76,7 @@
   .btn:active { transform: translateY(1px); }
   .btn.navy { background: linear-gradient(160deg, #14146E 0%, var(--navy) 100%); }
   .btn.navy:hover { filter: brightness(1.15); }
-  .btn.sm { min-height: 38px; padding: 0 14px; font-size: .85rem; border-radius: 8px; }
+  .btn.sm { min-height: 38px; padding: 0 60px; font-size: .85rem; border-radius: 8px; justify-content: center; }
   .btn.ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 2px var(--line); }
   .btn.ghost:hover { background: var(--tint); }
   .btn[aria-disabled="true"] { opacity: .45; pointer-events: none; }
